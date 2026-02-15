@@ -11,6 +11,7 @@ services:
       - ${DATA_PATH}/workspace:/home/node/.openclaw/workspace
     labels:
       - joyride.host.name=${OPENCLAW_CONTAINER_NAME:-openclaw}.${HOST_DOMAIN}
+      - traefik.docker.network=traefik
       - traefik.enable=${OPENCLAW_TRAEFIK_ENABLE:-true}
       - traefik.http.routers.openclaw.entrypoints=websecure
       - traefik.http.routers.openclaw.rule=Host(`${OPENCLAW_CONTAINER_NAME:-openclaw}.${HOST_DOMAIN}`)
