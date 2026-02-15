@@ -1,4 +1,4 @@
-.PHONY: deploy update backup shell build test-infra
+.PHONY: deploy update backup shell build test-infra smoke
 
 DEPLOY_HOST := $(shell grep '^DEPLOY_HOST=' .env | cut -d= -f2)
 ANSIBLE_CMD = docker compose -f infra/ansible/docker-compose.yml run --rm ansible
@@ -30,3 +30,7 @@ test-infra:
 	$(ANSIBLE_CMD) ansible-playbook --syntax-check playbooks/update.yml -e "deploy_host=test"
 	$(ANSIBLE_CMD) ansible-playbook --syntax-check playbooks/backup.yml -e "deploy_host=test"
 	@echo "All playbooks OK"
+
+# Run smoke tests against deployed instance
+smoke:
+	bash test/smoke_test.sh
