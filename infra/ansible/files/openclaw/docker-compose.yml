@@ -18,6 +18,12 @@ services:
       - traefik.http.services.openclaw.loadbalancer.server.port=18789
       - com.centurylinklabs.watchtower.enable=${OPENCLAW_WATCHTOWER_ENABLE:-true}
       - autoheal=${OPENCLAW_AUTOHEAL:-true}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:18789/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - traefik
       - default
