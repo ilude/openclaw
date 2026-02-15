@@ -10,6 +10,7 @@ services:
       OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       OLLAMA_BASE_URL: ${OLLAMA_URL}
+      COPILOT_GITHUB_TOKEN: ${COPILOT_GITHUB_TOKEN}
     volumes:
       - ${DATA_PATH}/config:/home/node/.openclaw
       - ${DATA_PATH}/workspace:/home/node/.openclaw/workspace
