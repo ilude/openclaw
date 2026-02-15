@@ -1,0 +1,36 @@
+services:
+  openclaw-gateway:
+    image: openclaw/openclaw:latest
+    container_name: ${OPENCLAW_CONTAINER_NAME:-openclaw}
+    ports:
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
+      - "${OPENCLAW_BRIDGE_PORT:-18790}:18790"
+    environment:
+      HOME: /home/node
+      TERM: xterm-256color
+      OPENCLAW_GATEWAY_TOKEN: ${OPENCLAW_GATEWAY_TOKEN}
+    volumes:
+      - ${DATA_PATH}/config:/home/node/.openclaw
+      - ${DATA_PATH}/workspace:/home/node/.openclaw/workspace
+    labels:
+      - joyride.host.name=${OPENCLAW_CONTAINER_NAME:-openclaw}.${HOST_DOMAIN}
+      - traefik.enable=${OPENCLAW_TRAEFIK_ENABLE:-true}
+      - traefik.http.routers.openclaw.entrypoints=websecure
+      - traefik.http.routers.openclaw.rule=Host(`${OPENCLAW_CONTAINER_NAME:-openclaw}.${HOST_DOMAIN}`)
+      - traefik.http.services.openclaw.loadbalancer.server.port=18789
+      - com.centurylinklabs.watchtower.enable=${OPENCLAW_WATCHTOWER_ENABLE:-true}
+      - autoheal=${OPENCLAW_AUTOHEAL:-true}
+    init: true
+    restart: unless-stopped
+    command:
+      - "node"
+      - "dist/index.js"
+      - "gateway"
+      - "--bind"
+      - "lan"
+      - "--port"
+      - "18789"
+
+networks:
+  default:
+    name: openclaw-network

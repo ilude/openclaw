@@ -1,0 +1,59 @@
+---
+- name: Deploy OpenClaw stack
+  hosts: openclaw
+  become: true
+
+  tasks:
+    - name: Create deploy directory
+      ansible.builtin.file:
+        path: "{{ deploy_path }}"
+        state: directory
+        mode: "0755"
+
+    - name: Create data directories
+      ansible.builtin.file:
+        path: "{{ data_path }}/{{ item }}"
+        state: directory
+        mode: "0755"
+      loop:
+        - config
+        - workspace
+
+    - name: Copy docker-compose.yml
+      ansible.builtin.copy:
+        src: "../files/openclaw/"
+        dest: "{{ deploy_path }}/"
+        mode: "0644"
+
+    - name: Copy .env file
+      ansible.builtin.copy:
+        src: "/project/.env"
+        dest: "{{ deploy_path }}/.env"
+        mode: "0600"
+
+    - name: Pull container images
+      ansible.builtin.command:
+        cmd: docker compose pull
+        chdir: "{{ deploy_path }}"
+      changed_when: true
+
+    - name: Start services
+      ansible.builtin.command:
+        cmd: docker compose up -d
+        chdir: "{{ deploy_path }}"
+      changed_when: true
+
+    - name: Wait for services to start
+      ansible.builtin.pause:
+        seconds: 10
+
+    - name: Show service status
+      ansible.builtin.command:
+        cmd: docker compose ps
+        chdir: "{{ deploy_path }}"
+      register: compose_status
+      changed_when: false
+
+    - name: Display status
+      ansible.builtin.debug:
+        var: compose_status.stdout_lines
