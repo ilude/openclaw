@@ -14,7 +14,19 @@
       ansible.builtin.file:
         path: "{{ data_path }}/{{ item }}"
         state: directory
+        owner: "1000"
+        group: "1000"
         mode: "0755"
+      loop:
+        - config
+        - workspace
+
+    - name: Fix data directory ownership (node user UID 1000)
+      ansible.builtin.file:
+        path: "{{ data_path }}/{{ item }}"
+        owner: "1000"
+        group: "1000"
+        recurse: true
       loop:
         - config
         - workspace
